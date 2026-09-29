@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+
+# Build artifacts
+**/bin/
+**/obj/
+artifacts/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+
+# Tests (not needed in runtime image)
+tests/
+
+# Documentation
+milestones/
+*.md
+!src/McpMemoryService/Scripts/*.sh
+!src/McpMemoryService/Scripts/*.ps1
+
+# Docker files themselves
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Local runtime config (may contain secrets; not needed in the build context)
+.env
+.env.*
+
+# ONNX model source (will be COPY'd explicitly, but exclude from context bloat)
+# NOTE: Models/ must be in context for COPY in Dockerfile
+# Keep Models/ in context
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/

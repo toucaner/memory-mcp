@@ -1,0 +1,41 @@
+services:
+  mcp-memory:
+    image: mcp-memory:latest
+    container_name: mcp-memory
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    env_file: .env
+    environment:
+      - QDRANT_URL=<url>
+      - LLM_CPP_URL=<url>
+      - Qdrant__Url=<url>
+      - LlmSummarizer__BaseUrl=<url>
+      - MODEL_DIR=/app/Models
+      - ASPNETCORE_URLS=http://+:5000
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft.AspNetCore=Warning
+    volumes:
+      - /mnt/MainPool/mcp-memory-models:/app/Models:ro
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'       # STRICT 1 core per SPEC §6.2
+          memory: 512M      # STRICT 512MB (int8 quantized model ~113MB [M14/ADR-011a] + runtime/native ~150-200MB + buffers = ~300MB; limit change deferred to M15)
+        reservations:
+          memory: 256M      # Minimum guaranteed memory
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s  # ONNX model loads slowly during startup
+    networks:
+      - mcp-network
+
+networks:
+  mcp-network:
+    driver: bridge
